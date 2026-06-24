@@ -29,8 +29,8 @@
     }
     if (!src) return;
     var scrollVh = parseFloat(div.getAttribute('data-scroll')) || 320;   // shorter runway by default
-    var height   = div.getAttribute('data-height') || '640px';           // graphic height — a band, NOT full viewport
-    var maxH     = div.getAttribute('data-max-height') ? parseFloat(div.getAttribute('data-max-height')) + 'px' : 'none';
+    var height   = div.getAttribute('data-height') || '700px';           // graphic height — a centered band, NOT full viewport
+    var maxH     = div.getAttribute('data-max-height') ? parseFloat(div.getAttribute('data-max-height')) + 'px' : '100%';
     var maxW     = (parseFloat(div.getAttribute('data-max-width')) || 1100) + 'px';
     var top      = (parseFloat(div.getAttribute('data-top')) || 0) + 'px';
 
@@ -42,16 +42,18 @@
     var sticky = document.createElement('div');
     sticky.style.position = 'sticky';
     sticky.style.top = top;
-    sticky.style.height = height;              // pin a band of this height, not the whole viewport
-    sticky.style.maxWidth = maxW;
-    sticky.style.margin = '0 auto';
+    sticky.style.height = 'calc(100vh - ' + top + ')';   // full pin area; the graphic centers within it
+    sticky.style.display = 'flex';
+    sticky.style.alignItems = 'center';
+    sticky.style.justifyContent = 'center';
 
     var iframe = document.createElement('iframe');
     iframe.src = src;
     iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('title', 'Data-center restrictions over time');
     iframe.style.width = '100%';
-    iframe.style.height = '100%';              // fill the band
+    iframe.style.maxWidth = maxW;
+    iframe.style.height = height;              // graphic height — centered band
     iframe.style.maxHeight = maxH;
     iframe.style.border = '0';
     iframe.style.display = 'block';
