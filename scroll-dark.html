@@ -75,10 +75,10 @@
   /* bar chart */
   #barwrap{flex:0 0 auto;margin:2px 0 2px}
   .bar-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 3px}
-  .bar-title{font-size:15px;font-weight:600;color:var(--faint)}
-  .bar-now{font-size:12.5px;color:var(--muted);font-weight:600}
+  .bar-title{font-size:13px;font-weight:600;color:var(--faint)}
+  .bar-now{font-size:13px;color:var(--muted);font-weight:600}
   svg#bars{display:block;width:100%;height:98px}
-  #bars .axis text{font-size:12px;fill:var(--faint)}
+  #bars .axis text{font-size:13px;fill:var(--faint)}
   #bars .gl{stroke:var(--hair);stroke-width:1}
 
   /* legend (sits above the map) + footnote — Status row, then Level row */
@@ -353,11 +353,6 @@ sRow.append('span').attr('class','lg-lab').text('Status');
 [['perm','Active ban'],['exp','Expired ban']]
   .forEach(([k,lab])=>{ const el=sRow.append('span').attr('class','key');
     el.append('span').attr('class','sw').style('background',COL[k]); el.append('span').text(lab); });
-const lRow=lg.append('div').attr('class','lg-row');
-lRow.append('span').attr('class','lg-lab').text('Level');
-[['local','City / town'],['county','County'],['state','State']]
-  .forEach(([k,lab])=>{ const el=lRow.append('span').attr('class','key shape');
-    el.append('span').html(shapeSVG(k)); el.append('span').text(lab); });
 
 // ---------- footnote ----------
 document.getElementById('foot').innerHTML=
