@@ -9,6 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <style>
+  /* The Information house fonts (Suisse), served from ti-assets */
+  @font-face{font-family:'Suisse Works';src:url('https://ti-assets.theinformation.com/assets/SuisseWorks-Regular-b4272f237eca2e6d617bb382940a1c974784e44a98043c153bf6e6198948021d.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Suisse Screen';src:url('https://ti-assets.theinformation.com/assets/SuisseScreen-Regular-72db97be84d92e41a28233e706820cc6e5daf2a21aaceb7b79c19cee84a77a21.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Suisse Intl Mono';src:url('https://ti-assets.theinformation.com/assets/SuisseIntlMono-Regular-177352b94a6187dbcce69fb8a64a16a1d27d5725b80f28453cb73ecbbb67548c.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
   :root{
     --ink:#1a1a1a; --muted:#333333; --faint:#888888; --hair:#e7e8ea;
     --land:#eceef0; --land-line:#ffffff; --nation:#c7cace;
@@ -17,7 +21,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--bg)}
-  body{font-family:'Source Sans 3',-apple-system,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink)}
+  body{font-family:'Suisse Screen','Source Sans 3',-apple-system,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink)}
 
   /* the iframe-owned scroll area: a tall track with a pinned stage */
   #scroller{height:100vh;overflow-y:auto;overflow-x:hidden;position:relative;
@@ -31,16 +35,16 @@
     transition:width .05s linear;z-index:8}
 
   .header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:0 0 3px}
-  h1{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:25px;line-height:1.1;
+  h1{font-family:'Suisse Works','Source Serif 4',Georgia,serif;font-weight:700;font-size:28px;line-height:1.1;
     letter-spacing:-.4px;margin:0;color:var(--ink)}
   .logo{height:24px;width:auto;flex:0 0 auto;margin-top:3px}
-  .sub{font-family:'Source Serif 4',Georgia,serif;font-size:14.5px;line-height:1.4;color:var(--muted);
+  .sub{font-family:'Suisse Screen','Source Sans 3',Arial,sans-serif;font-size:18px;line-height:1.4;color:var(--muted);
     margin:0 0 5px;max-width:720px}
 
   /* readout: the running date + counts (label sits inline next to the number) */
   .readout{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
     border-top:1px solid var(--hair);padding:6px 0 2px;margin:0;flex-wrap:wrap}
-  #date{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:26px;line-height:1;
+  #date{font-family:'Suisse Works','Source Serif 4',Georgia,serif;font-weight:700;font-size:26px;line-height:1;
     color:var(--readout);letter-spacing:-.4px;font-variant-numeric:tabular-nums}
   .tally{text-align:right;line-height:1.05}
   #count{font-weight:600;font-size:26px;color:var(--in);font-variant-numeric:tabular-nums}
@@ -62,7 +66,7 @@
   #cue .ar{display:inline-block;animation:bob 1.4s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
   #replay{top:50%;transform:translate(-50%,-50%);display:none;align-items:center;gap:8px;
-    font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;color:#fff;
+    font-family:'Suisse Screen','Source Sans 3',sans-serif;font-size:14px;font-weight:600;color:#fff;
     background:var(--in);border:0;border-radius:24px;padding:10px 20px;cursor:pointer;
     box-shadow:0 6px 20px rgba(243,42,82,.35)}
   #replay:hover{filter:brightness(.95)}
@@ -71,10 +75,10 @@
   /* bar chart */
   #barwrap{flex:0 0 auto;margin:2px 0 2px}
   .bar-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 3px}
-  .bar-title{font-size:13.5px;font-weight:600;color:var(--faint)}
-  .bar-now{font-size:11px;color:var(--muted);font-weight:600}
-  svg#bars{display:block;width:100%;height:90px}
-  #bars .axis text{font-size:9px;fill:var(--faint)}
+  .bar-title{font-size:15px;font-weight:600;color:var(--faint)}
+  .bar-now{font-size:12.5px;color:var(--muted);font-weight:600}
+  svg#bars{display:block;width:100%;height:98px}
+  #bars .axis text{font-size:12px;fill:var(--faint)}
   #bars .gl{stroke:var(--hair);stroke-width:1}
 
   /* legend (sits above the map) + footnote — Status row, then Level row */
@@ -84,22 +88,22 @@
   .key{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#3b3f45;line-height:1}
   .key .sw{width:11px;height:11px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 1px #fff inset}
   .key.shape svg{display:block}
-  .foot{font-size:11px;line-height:1.4;color:var(--faint);padding-top:6px;text-align:right}
+  .foot{font-family:'Suisse Intl Mono','Source Sans 3',monospace;font-size:14px;line-height:1.4;color:var(--faint);padding-top:6px;text-align:right}
   .foot b{color:#555;font-weight:600}
 
   /* mobile */
   @media (max-width:560px){
     #stage{padding:11px 13px 10px}
-    h1{font-size:18px;letter-spacing:-.2px}
+    h1{font-size:22px;letter-spacing:-.2px}
     .logo{height:17px}
-    .sub{font-size:12.5px;margin-bottom:6px}
+    .sub{font-size:15px;margin-bottom:6px}
     #date{font-size:20px}
     #count{font-size:20px}
     .tally .clab{font-size:11.5px;margin-left:4px}
     #mapbox{min-height:130px}
-    svg#bars{height:72px}
+    svg#bars{height:82px}
     .key{font-size:11px}
-    .foot{text-align:left;font-size:10px}
+    .foot{text-align:left;font-size:12.5px}
   }
 
   /* dark theme */
@@ -253,7 +257,7 @@ const maxBar=Math.max(1,d3.max(slots,s=>s.en));
 let barRects=[], yearTicks=[], BW=0, BH=58, GAP=1.4, bx0=0;
 function layoutBars(){
   const w=barsSvg.node().getBoundingClientRect().width||600;
-  BH=isMobile()?54:74; const axisH=16; const totalH=BH+axisH;
+  BH=isMobile()?54:74; const axisH=20; const totalH=BH+axisH;
   barsSvg.attr('viewBox',`0 0 ${w} ${totalH}`);
   barsSvg.selectAll('*').remove();
   BW=(w-(slots.length-1)*GAP)/slots.length; bx0=0;
@@ -268,7 +272,7 @@ function layoutBars(){
   const ax=barsSvg.append('g').attr('class','axis');
   slots.forEach((s,i)=>{ if(s.m===0){ const x=i*(BW+GAP);
     ax.append('line').attr('class','gl').attr('x1',x).attr('x2',x).attr('y1',0).attr('y2',BH);
-    ax.append('text').attr('x',x+2).attr('y',BH+11).text(s.y); } });
+    ax.append('text').attr('x',x+2).attr('y',BH+15).text(s.y); } });
 }
 
 // ---------- the single render entry point ----------
