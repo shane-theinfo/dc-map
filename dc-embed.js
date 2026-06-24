@@ -1,24 +1,16 @@
-/* dc-embed.js — Flourish-style scrollytelling loader for the data-center map.
- *
- * Paste into your CMS (survives flattening — it's just one <div> + one external <script src>):
+/* dc-embed.js — scroll-driven embed loader for the data-center time-lapse map.
  *
  *   <div class="dc-scroll-embed"></div>
  *   <script src="https://shane-theinfo.github.io/dc-map/dc-embed.js"></script>
  *
- * With no data-src it loads scroll-light.html from the same folder as this script.
- * For the dark version: <div class="dc-scroll-embed" data-theme="dark"></div>
- * Or point anywhere explicitly: <div class="dc-scroll-embed" data-src="https://.../scroll-light.html"></div>
- *
- * The script finds the div, builds a sticky "tractor" section, and forwards the page's
- * scroll position into the graphic so the timeline plays as the reader scrolls — then the
- * article continues underneath. No inline styles or inline scripts for the CMS to strip.
+ * With no data-src it loads scroll-light.html from the same folder as this script;
+ * use data-theme="dark" for scroll-dark.html, or data-src="..." to point anywhere.
  *
  * Optional data- attributes on the div:
- *   data-scroll="760"      total scroll length, in vh — raise for slower/more resistance (default 760)
- *   data-height="85vh"     graphic height while pinned (default 85vh)
- *   data-max-height="750"  cap on graphic height, in px (default 750)
- *   data-max-width="900"   max graphic width, in px (default 900)
- *   data-top="0"           sticky offset from top, in px — set to your CMS nav-bar height if it has a fixed header
+ *   data-scroll   total scroll length, in vh (raise for a slower scroll)
+ *   data-height   graphic height while pinned
+ *   data-max-height / data-max-width   caps, in px
+ *   data-top      sticky offset from top, in px (set to a fixed nav-bar height)
  */
 (function () {
   // URL of this script, so we can default to scroll-light.html sitting next to it
