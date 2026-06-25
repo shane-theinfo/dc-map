@@ -9,8 +9,8 @@
  *   data-theme="dark"      load player-dark.html
  *   data-height="720px"    box height
  *   data-max-width="1100"  max width, px
- *   data-start="50"        percent of the box visible before it plays ("50", "0.5"), or "bottom"
- *                          to wait until the bar chart (bottom of the box) scrolls in. Default 50%.
+ *   data-start="75"        percent of the box visible before it plays ("75", "0.75"), or "bottom"
+ *                          to wait until the bar chart (bottom of the box) scrolls in. Default 75%.
  */
 (function () {
   // URL of this script, so we can default to player-light.html sitting next to it
@@ -56,7 +56,7 @@
       }
     }
 
-    var startAt = (div.getAttribute('data-start') || '50').trim().toLowerCase();
+    var startAt = (div.getAttribute('data-start') || '75').trim().toLowerCase();
     if (startAt === 'bottom') {                      // robust even when the box is taller than the viewport
       var sentinel = document.createElement('div');
       sentinel.style.cssText = 'width:100%;height:1px';
