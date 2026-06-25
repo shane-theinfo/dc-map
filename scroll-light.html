@@ -34,6 +34,14 @@
   #prog{position:absolute;left:0;top:0;height:3px;width:0;background:var(--in);
     transition:width .05s linear;z-index:8}
 
+  /* player-mode control bar (play/pause + scrubber) — shown only in .player mode */
+  #controls{display:none;align-items:center;gap:10px;height:26px;margin:0 0 9px}
+  #playpause{flex:0 0 auto;width:26px;height:26px;border:0;border-radius:50%;background:var(--in);
+    color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  #playpause svg{width:13px;height:13px;fill:#fff;display:block}
+  #scrub{position:relative;flex:1 1 auto;height:6px;border-radius:3px;background:var(--hair);cursor:pointer;touch-action:none}
+  #scrubfill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--in);border-radius:3px;pointer-events:none}
+
   .header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:0 0 3px}
   h1{font-family:'Suisse Works','Source Serif 4',Georgia,serif;font-weight:700;font-size:28px;line-height:1.1;
     letter-spacing:-.4px;margin:0;color:var(--ink)}
@@ -121,6 +129,10 @@
   <div id="track">
     <div id="stage">
       <div id="prog"></div>
+      <div id="controls">
+        <button id="playpause" type="button" aria-label="Play"></button>
+        <div id="scrub"><div id="scrubfill"></div></div>
+      </div>
 
       <div class="header-row">
         <h1 id="hed">Banned Together</h1>
@@ -172,6 +184,7 @@ const W=806, HMAP=500;
 // fixed window: histogram + clock run Jan 2024 -> June 2026 (records outside clamp to the edges)
 const dateToOrd=(y,m,d)=>Math.round(Date.UTC(y,m-1,d)/864e5)+719163;
 const T0=dateToOrd(2025,1,1), T1=dateToOrd(2026,6,24), TSPAN=Math.max(1,T1-T0);   // ends at the publish date
+const PLAYER = document.body.classList.contains('player') || new URLSearchParams(location.search).has('player');
 const clampSD=sd=>sd==null?null:Math.max(T0,Math.min(T1,sd));
 const mq=window.matchMedia('(max-width:560px)');
 const isMobile=()=>mq.matches;
@@ -297,8 +310,9 @@ function setProgress(prog){
   document.getElementById('barnow').textContent=fmtDate(t);
   // chrome
   document.getElementById('prog').style.width=(prog*100)+'%';
+  if(PLAYER) document.getElementById('scrubfill').style.width=(prog*100)+'%';
   const cue=document.getElementById('cue'); cue.style.opacity=prog>0.01?0:1;
-  document.getElementById('replay').style.display=prog>0.995?'flex':'none';
+  document.getElementById('replay').style.display=(!PLAYER && prog>0.995)?'flex':'none';
 }
 
 // ---------- scroll driving ----------
@@ -311,9 +325,14 @@ scroller.addEventListener('scroll',()=>{ if(!externallyDriven) setProgress(readP
 // optional parent-driven mode: a host page posts {type:'dcScrollProgress', p:0..1} to drive
 // the timeline from its own scroll (true scrollytelling). Falls back to inner scroll otherwise.
 window.addEventListener('message',e=>{
-  const d=e.data; if(!d||d.type!=='dcScrollProgress'||typeof d.p!=='number') return;
-  if(!externallyDriven){ externallyDriven=true; scroller.style.overflowY='hidden'; scroller.scrollTop=0; }
-  setProgress(Math.max(0,Math.min(1,d.p)));
+  const d=e.data; if(!d) return;
+  if(d.type==='dcPlay'){ if(PLAYER) pPlay(); return; }     // host scrolled the box into view
+  if(d.type==='dcPause'){ if(PLAYER) pPause(); return; }
+  if(d.type==='dcScrollProgress' && typeof d.p==='number'){
+    if(PLAYER) return;                                      // player ignores scroll-driving
+    if(!externallyDriven){ externallyDriven=true; scroller.style.overflowY='hidden'; scroller.scrollTop=0; }
+    setProgress(Math.max(0,Math.min(1,d.p)));
+  }
 });
 
 // ---------- play / replay ----------
@@ -339,6 +358,37 @@ if(new URLSearchParams(location.search).has('autoplay')){
   document.getElementById('cue').style.display='none';   // no "scroll to begin" — it plays itself
   setProgress(0);
   setTimeout(playFromStart,600);               // small beat so the map is painted first
+}
+
+// ---------- player mode (?player / body.player): fixed box, top scrubber + play/pause,
+// auto-starts when the host scrolls it into view (loader posts dcPlay). NOT a scrolly. ----------
+const PLAY_SVG='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const PAUSE_SVG='<svg viewBox="0 0 24 24"><path d="M6 5h3.5v14H6zM14.5 5H18v14h-3.5z"/></svg>';
+let pProg=0, pPlaying=false, pRaf=null, pT0=null, pBase=0, pStarted=false;
+const PDUR=5000;                               // play-through duration (ms)
+function pIcon(){ const b=document.getElementById('playpause'); if(!b)return;
+  b.innerHTML=pPlaying?PAUSE_SVG:PLAY_SVG; b.setAttribute('aria-label',pPlaying?'Pause':'Play'); }
+function pStep(ts){ if(pT0===null)pT0=ts; pProg=Math.min(1,pBase+(ts-pT0)/PDUR); setProgress(pProg);
+  if(pProg<1){ pRaf=requestAnimationFrame(pStep); } else { pPlaying=false; pIcon(); } }
+function pPlay(){ if(pPlaying)return; pStarted=true; if(pProg>=1)pProg=0; pPlaying=true; pBase=pProg; pT0=null; pIcon(); pRaf=requestAnimationFrame(pStep); }
+function pPause(){ if(!pPlaying)return; pPlaying=false; cancelAnimationFrame(pRaf); pIcon(); }
+function pToggle(){ pPlaying?pPause():pPlay(); }
+function pSeek(x){ pProg=Math.max(0,Math.min(1,x)); pBase=pProg; pT0=null; setProgress(pProg); }
+if(PLAYER){
+  externallyDriven=true; scroller.style.overflowY='hidden'; scroller.scrollTop=0;
+  document.getElementById('cue').style.display='none';
+  document.getElementById('prog').style.display='none';
+  document.getElementById('replay').style.display='none';
+  document.getElementById('controls').style.display='flex';
+  setProgress(0); pIcon();
+  document.getElementById('playpause').addEventListener('click',pToggle);
+  const scrub=document.getElementById('scrub');
+  const scrubTo=ev=>{ const r=scrub.getBoundingClientRect(); pSeek((ev.clientX-r.left)/r.width); };
+  scrub.addEventListener('pointerdown',ev=>{ scrub.setPointerCapture(ev.pointerId);
+    const wasPlaying=pPlaying; if(wasPlaying)pPause(); scrubTo(ev);
+    const mv=e2=>scrubTo(e2);
+    const up=()=>{ scrub.removeEventListener('pointermove',mv); scrub.removeEventListener('pointerup',up); if(wasPlaying)pPlay(); };
+    scrub.addEventListener('pointermove',mv); scrub.addEventListener('pointerup',up); });
 }
 
 // ---------- legend ----------
