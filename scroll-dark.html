@@ -365,7 +365,7 @@ if(new URLSearchParams(location.search).has('autoplay')){
 const PLAY_SVG='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24"><path d="M6 5h3.5v14H6zM14.5 5H18v14h-3.5z"/></svg>';
 let pProg=0, pPlaying=false, pRaf=null, pT0=null, pBase=0, pStarted=false;
-const PDUR=5000;                               // play-through duration (ms)
+const PDUR=10000;                              // play-through duration (ms)
 function pIcon(){ const b=document.getElementById('playpause'); if(!b)return;
   b.innerHTML=pPlaying?PAUSE_SVG:PLAY_SVG; b.setAttribute('aria-label',pPlaying?'Pause':'Play'); }
 function pStep(ts){ if(pT0===null)pT0=ts; pProg=Math.min(1,pBase+(ts-pT0)/PDUR); setProgress(pProg);
