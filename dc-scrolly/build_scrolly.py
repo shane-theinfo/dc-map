@@ -286,13 +286,28 @@ function setProgress(p){
   const i = Math.min(N-1, Math.floor(p*N));
   goScene(i);
   const local = p*N - i;                       // 0..1 within the current scene's band
-  // fade the card in over the first ~26% and out over the last ~26% of its band,
-  // leaving a map-only beat before and after each box
-  let op = local<0.26 ? local/0.26 : local>0.74 ? (1-local)/0.26 : 1;
+  // Each band: a generous map-only gap at the start & end (time to look / click
+  // around), with the card fading in/out and holding only in the middle.
+  //   [0 .. GAP]      map only
+  //   [GAP .. GAP+FADE] fade in
+  //   [.. 1-GAP-FADE]   hold (card fully shown)
+  //   [.. 1-GAP]        fade out
+  //   [1-GAP .. 1]      map only
+  const GAP = 0.24, FADE = 0.11;   // hold (fully readable) = 1 - 2*GAP - 2*FADE ≈ 30% of the band
+  let op;
+  if(local < GAP || local > 1-GAP) op = 0;
+  else if(local < GAP+FADE) op = (local-GAP)/FADE;
+  else if(local > 1-GAP-FADE) op = (1-GAP-local)/FADE;
+  else op = 1;
   op = Math.max(0, Math.min(1, op));
   cards.forEach((c,idx)=>{
-    if(idx===i){ c.style.opacity = op; c.style.transform = `translateX(-50%) translateY(${(1-op)*18}px)`; }
-    else if(c.style.opacity!=='0'){ c.style.opacity = '0'; }
+    if(idx===i){
+      c.style.opacity = op;
+      c.style.transform = `translateX(-50%) translateY(${(1-op)*18}px)`;
+      c.style.pointerEvents = op>0.05 ? 'auto' : 'none';   // don't block the map during gaps
+    } else if(c.style.opacity!=='0'){
+      c.style.opacity = '0'; c.style.pointerEvents = 'none';
+    }
   });
 }
 
@@ -338,6 +353,7 @@ EMBED_SRC = pathlib.Path.home() / "Desktop/GitHub/dc-map/dc-embed.js"
 if EMBED_SRC.exists():
     loader = EMBED_SRC.read_text(encoding="utf-8")
     loader = loader.replace("|| '700px'", "|| '90vh'", 1)
+    loader = loader.replace("|| 320", "|| 520", 1)   # longer scroll runway: slower pace + dwell time on each box
     (OUT / "dc-embed.js").write_text(loader, encoding="utf-8")
 
 print("wrote scroll-dark.html, scroll-light.html, index.html, light.html, dc-embed.js")
