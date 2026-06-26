@@ -29,7 +29,7 @@
     }
     if (!src) return;
     var scrollVh = parseFloat(div.getAttribute('data-scroll')) || 320;   // shorter runway by default
-    var height   = div.getAttribute('data-height') || '700px';           // graphic height — a centered band, NOT full viewport
+    var height   = div.getAttribute('data-height') || '90vh';           // graphic height — a centered band, NOT full viewport
     var maxH     = div.getAttribute('data-max-height') ? parseFloat(div.getAttribute('data-max-height')) + 'px' : '100%';
     var maxW     = (parseFloat(div.getAttribute('data-max-width')) || 1100) + 'px';
     var top      = (parseFloat(div.getAttribute('data-top')) || 0) + 'px';

@@ -39,9 +39,9 @@ SCROLLY_CSS = r"""
   /* the graphic is a fixed-height stage; dc-embed.js pins it and posts progress */
   #stage{position:sticky;top:0;height:100vh;height:100dvh;display:flex;flex-direction:column;
     align-items:center;justify-content:center;overflow:hidden}
-  #stage #wrap{min-height:0;height:auto;max-width:820px;width:100%;padding:14px 18px;justify-content:center}
+  #stage #wrap{min-height:0;height:auto;max-width:1040px;width:100%;padding:14px 18px;justify-content:center}
   #stage #mapbox{margin-top:6px}
-  #stage svg.map{max-height:62vh}
+  #stage svg.map{max-height:88vh}
   #sheet{display:none!important}                 /* uses the floating tip only */
   #stage .foot{position:static;background:none;text-align:left;margin-top:8px;padding:6px 0 0}
 
@@ -331,10 +331,14 @@ light = text.replace('<body class="dark">', '<body>', 1)
 (OUT / "index.html").write_text(dark,  encoding="utf-8")
 (OUT / "light.html").write_text(light, encoding="utf-8")
 
-# bring the existing loader alongside so the embed works the same way as the others
+# bring the existing loader alongside so the embed works the same way as the others.
+# This scrolly graphic is taller than the time-lapse, so default the pinned height to
+# 90vh (fills most of the viewport, small bands) instead of the loader's 700px.
 EMBED_SRC = pathlib.Path.home() / "Desktop/GitHub/dc-map/dc-embed.js"
 if EMBED_SRC.exists():
-    (OUT / "dc-embed.js").write_text(EMBED_SRC.read_text(encoding="utf-8"), encoding="utf-8")
+    loader = EMBED_SRC.read_text(encoding="utf-8")
+    loader = loader.replace("|| '700px'", "|| '90vh'", 1)
+    (OUT / "dc-embed.js").write_text(loader, encoding="utf-8")
 
 print("wrote scroll-dark.html, scroll-light.html, index.html, light.html, dc-embed.js")
 print("dark size:", (OUT/'scroll-dark.html').stat().st_size, "bytes")
